@@ -5,3 +5,8 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Android build & cache
+**/build/
+**/.gradle/
+local.properties
+*.zip
