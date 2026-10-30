@@ -1,0 +1,31 @@
+{
+  "name": "Autosugestión FunTaDeHu",
+  "short_name": "Autosugestión",
+  "description": "Frases de autosugestión aleatorias para ser eficaces y felices",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#081120",
+  "theme_color": "#081120",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./logo.png",
+      "sizes": "445x466",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

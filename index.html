@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Autosugestión FunTaDeHu</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0B1528">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+  <style>
+    :root {
+      --bg-dark: #081120;
+      --card-bg: rgba(16, 32, 60, 0.85);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary-blue: #1d4ed8;
+      --accent-blue: #38bdf8;
+      --accent-gold: #facc15;
+      --success-green: #10b981;
+      --warning-amber: #f59e0b;
+      --danger-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #0e2448 0%, var(--bg-dark) 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px 12px 40px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .logo-wrapper {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, #ffffff, #38bdf8, #1e40af);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.2);
+      margin-bottom: 12px;
+    }
+
+    .logo-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #0d2040;
+      display: block;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--accent-blue);
+      font-weight: 500;
+      letter-spacing: 0.8px;
+      margin-top: 2px;
+    }
+
+    /* Card base */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Status Banner */
+    .status-card {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .status-badge.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .status-badge.resting {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status-badge.active .status-dot {
+      box-shadow: 0 0 10px #34d399;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.7;
+      }
+
+      50% {
+        transform: scale(1.3);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(0.9);
+        opacity: 0.7;
+      }
+    }
+
+    .status-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .next-timer {
+      font-size: 13px;
+      color: var(--accent-gold);
+      font-weight: 600;
+      background: rgba(250, 204, 21, 0.1);
+      padding: 4px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(250, 204, 21, 0.2);
+    }
+
+    /* Main Action Buttons Grid */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 16px 12px;
+      border-radius: 16px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      width: 100%;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-icon {
+      font-size: 24px;
+    }
+
+    /* Button Rest */
+    .btn-rest {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+    }
+
+    .btn-rest:hover {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    /* Button Reactivate */
+    .btn-reactivate {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+    }
+
+    .btn-reactivate:hover {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    /* Button Add Phrase (Full width) */
+    .btn-add {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+      padding: 14px;
+      flex-direction: row;
+      gap: 10px;
+      font-size: 15px;
+    }
+
+    .btn-add:hover {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+
+    /* Quick Test Button */
+    .btn-test {
+      grid-column: span 2;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+      padding: 10px;
+      flex-direction: row;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 12px;
+    }
+
+    .btn-test:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* Recent Quote Card */
+    .quote-card {
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.5), rgba(15, 23, 42, 0.6));
+      border-left: 4px solid var(--accent-blue);
+      position: relative;
+    }
+
+    .quote-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-blue);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .quote-text {
+      font-size: 15px;
+      font-style: italic;
+      line-height: 1.5;
+      color: #ffffff;
+    }
+
+    /* Phrases List Section */
+    .phrases-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .phrases-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phrases-count {
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--accent-blue);
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .phrases-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .phrases-list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .phrases-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .phrase-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      gap: 10px;
+    }
+
+    .phrase-text {
+      flex: 1;
+      color: #e2e8f0;
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+      color: var(--danger-red);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Interval selector */
+    .interval-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--card-border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .interval-select {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #0f1f38;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 22px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      animation: modalPop 0.25s ease-out;
+    }
+
+    @keyframes modalPop {
+      from {
+        transform: scale(0.92);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .modal-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .phrase-input {
+      width: 100%;
+      height: 90px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px;
+      color: #ffffff;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      margin-bottom: 16px;
+    }
+
+    .phrase-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-save {
+      flex: 1.5;
+      padding: 12px;
+      background: var(--primary-blue);
+      border: none;
+      border-radius: 12px;
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+      z-index: 2000;
+      pointer-events: none;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Ocultar completamente cualquier marca, badge, drawer o widget inyectado por Netlify */
+    [class*="netlify"],
+    [id*="netlify"],
+    [data-netlify],
+    [aria-label*="Netlify"],
+    iframe[src*="netlify"],
+    .netlify-badge,
+    #netlify-badge,
+    a[href*="netlify.com"],
+    div:has(> a[href*="netlify.com"]) {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <!-- Header with Logo -->
+    <header class="header">
+      <div class="logo-wrapper">
+        <img src="logo.png" alt="FunTaDeHu Logo" class="logo-img" onerror="this.src='logo.jpg'">
+      </div>
+      <h1 class="title">FunTaDeHu</h1>
+      <p class="subtitle">Autosugestión • Para Ser Eficaces y Felices</p>
+      <div id="offlineBadge" style="display: none; margin-top: 8px; font-size: 11px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 3px 10px; border-radius: 20px;">
+        📶 Modo Offline (100% Funcional sin Internet)
+      </div>
+    </header>
+
+    <!-- Install Banner Card (Prominent) -->
+    <div id="installCard" class="card" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.8), rgba(15, 23, 42, 0.95)); border: 1px solid rgba(56, 189, 248, 0.4); text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);">
+      <div style="font-size: 15px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">
+        📲 Instalar directamente en tu Teléfono
+      </div>
+      <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">
+        Se guardará en tu pantalla de inicio con el logo de FunTaDeHu y <strong>funcionará 100% offline</strong> sin consumir datos.
+      </p>
+      <button id="btnInstall" class="btn" style="background: linear-gradient(135deg, #38bdf8, #0284c7); color: #081120; font-size: 15px; font-weight: 800; padding: 14px 20px; border-radius: 14px; width: 100%; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);" onclick="handleInstallClick()">
+        ⚡ Instalar en Pantalla de Inicio
+      </button>
+    </div>
+
+    <!-- Status Card -->
+    <div class="card status-card">
+      <div id="statusBadge" class="status-badge active">
+        <span class="status-dot"></span>
+        <span id="statusText">Modo Activo</span>
+      </div>
+      <p id="statusDesc" class="status-desc">
+        El sistema está funcionando. Recibirás frases de autosugestión aleatorias a lo largo del día.
+      </p>
+      <div id="nextTimer" class="next-timer">
+        ⏳ Próxima frase en aprox: <span id="timerCountdown">25:00</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions-grid">
+      <!-- Botón Modo Descanso -->
+      <button id="btnRest" class="btn btn-rest" onclick="toggleRestMode(true)">
+        <span class="btn-icon">⏸️</span>
+        <span>Modo Descanso</span>
+      </button>
+
+      <!-- Botón Reactivar -->
+      <button id="btnReactivate" class="btn btn-reactivate" onclick="toggleRestMode(false)">
+        <span class="btn-icon">▶️</span>
+        <span>Reactivar</span>
+      </button>
+
+      <!-- Botón Agregar Otra Frase -->
+      <button class="btn btn-add" onclick="openAddModal()">
+        <span class="btn-icon">➕</span>
+        <span>Agregar Frase de Autosugestión</span>
+      </button>
+
+      <!-- Botón Probar Notificación Inmediata -->
+      <button class="btn btn-test" onclick="triggerTestNotification()">
+        <span>🔔 Probar Notificación Ahora</span>
+      </button>
+    </div>
+
+    <!-- Recent Quote Preview -->
+    <div class="card quote-card">
+      <div class="quote-label">✨ Frase actual en mente:</div>
+      <div id="currentQuote" class="quote-text">
+        "Todos los días, en todos los sentidos, estoy mejor, mejor y mejor."
+      </div>
+    </div>
+
+    <!-- Phrases List Section -->
+    <div class="card">
+      <div class="phrases-header">
+        <div class="phrases-title">
+          <span>📚 Lista de Frases</span>
+          <span id="phrasesCount" class="phrases-count">0</span>
+        </div>
+      </div>
+
+      <div id="phrasesList" class="phrases-list">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Interval Selector -->
+      <div class="interval-row">
+        <span>Frecuencia estimada:</span>
+        <select id="intervalSelect" class="interval-select" onchange="changeInterval(this.value)">
+          <option value="test">Modo Prueba (Cada 30 seg)</option>
+          <option value="15">Cada 15 min</option>
+          <option value="30" selected>Aleatorio (~30 min)</option>
+          <option value="60">Aleatorio (~1 hora)</option>
+          <option value="120">Aleatorio (~2 horas)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Phone Access Card (Only shown when running locally) -->
+    <div id="localNetworkCard" class="card"
+      style="display: none; text-align: center; border: 1px dashed rgba(56, 189, 248, 0.4); background: rgba(14, 30, 58, 0.6);">
+      <div style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 6px;">
+        📱 Abrir desde la red Wi-Fi local
+      </div>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+        Conecta tu teléfono a tu misma red Wi-Fi y entra a esta dirección en Chrome o Safari:
+      </p>
+      <div
+        style="background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; font-family: monospace; font-size: 14px; color: #38bdf8; font-weight: bold; margin-bottom: 12px; user-select: all;">
+        http://192.168.9.109:8080
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal for Adding Phrase -->
+  <div id="addModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 class="modal-title">Nueva Frase de Autosugestión</h3>
+      <p class="modal-desc">Escribe la frase que quieres que la app te lance aleatoriamente en el día.</p>
+      <textarea id="newPhraseInput" class="phrase-input"
+        placeholder="Ej: Me siento lleno de serenidad, enfoque y determinación..."></textarea>
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeAddModal()">Cancelar</button>
+        <button class="btn-save" onclick="saveNewPhrase()">Guardar Frase</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast message -->
+  <div id="toast" class="toast">Mensaje</div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

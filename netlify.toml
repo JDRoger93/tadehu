@@ -1,0 +1,6 @@
+[build.processing]
+  skip_processing = true
+
+[context.deploy-preview]
+  # Desactivar drawer de previsualización
+  command = ""
