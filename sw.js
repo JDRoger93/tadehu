@@ -1,4 +1,4 @@
-const CACHE_NAME = 'autosugestion-funtadehu-v5';
+const CACHE_NAME = 'autosugestion-funtadehu-v6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -7,6 +7,8 @@ const ASSETS_TO_CACHE = [
   './logo.png',
   './logo.jpg',
   './notification-bird.png',
+  './notification-bird-192.png',
+  './notification-bird-96.png',
   './notification-badge.png',
   './icon-192.png',
   './icon-512.png'
