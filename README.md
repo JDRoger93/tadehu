@@ -21,3 +21,4 @@ Aplicación web progresiva (PWA) de autosugestión diseñada para ejecutarse en 
 ## 🚀 Despliegue en Netlify
 
 El repositorio está enlazado directamente a Netlify. Cada `git push` a la rama `main` compila y publica automáticamente la versión más reciente en producción.
+
